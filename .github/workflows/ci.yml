@@ -44,14 +44,14 @@ jobs:
             exit 1
           fi
         continue-on-error: true
-      - id: google_auth
-        if: steps.check-id-token.outcome == 'success'
-        name: "Authenticate to Google Cloud"
-        uses: google-github-actions/auth@v1
-        with:
-          workload_identity_provider: "projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider"
-          service_account: "sa-github-actions@qc-minimalkv.iam.gserviceaccount.com"
-          token_format: "access_token"
+      # - id: google_auth
+      #   if: steps.check-id-token.outcome == 'success'
+      #   name: "Authenticate to Google Cloud"
+      #   uses: google-github-actions/auth@v1
+      #   with:
+      #     workload_identity_provider: "projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider"
+      #     service_account: "sa-github-actions@qc-minimalkv.iam.gserviceaccount.com"
+      #     token_format: "access_token"
       - name: Run the unittests
         shell: bash -x -l {0}
         run: |
