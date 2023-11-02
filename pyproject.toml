@@ -46,6 +46,44 @@ exclude = '''
 )/
 '''
 
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+select = [
+    # pyflakes
+    "F",
+    # pycodestyle
+    "E", "W",
+    # flake8-builtins
+    "A",
+    # flake8-bugbear
+    "B",
+    # flake8-comprehensions
+    "C4",
+    # flake8-simplify
+    "SIM",
+    # flake8-unused-arguments
+    "ARG",
+    # pylint
+    "PL",
+    # tidy
+    "TID",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # pyupgrade
+    "UP"
+]
+
+ignore = [
+    # function-call-in-default-argument
+    # "B008",
+    # unused-function-argument
+    # "ARG001",
+]
+
 [tool.isort]
 multi_line_output = 3
 include_trailing_comma = true
