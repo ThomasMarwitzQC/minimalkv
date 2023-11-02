@@ -20,6 +20,7 @@ jobs:
           POSTGRES_PASSWORD: minimalkv_test
           POSTGRES_USER: minimalkv_test
     env:
+      ACTIONS_ID_TOKEN_REQUEST_URL: dummy_value
       SIMPLEKV_CI: 1
     steps:
       - uses: actions/checkout@v4
