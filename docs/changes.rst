@@ -1,6 +1,35 @@
 Changelog
 *********
 
+1.9.1
+=====
+* Add a real AWS integration test for S3FSStore
+* Add minio test for S3FSStore
+* `verify` url param that can be passed to url when creating a `[h]s3://` store now really controls SSL verifaction
+* Refactor tests to not skip Boto3Store / S3FSStore tests anymore if `boto` is unavailible
+
+1.9.0
+=====
+* Add `session_token` url param that can be set when creating a `[h]s3://` store
+  via `get_store_from_url`.
+
+1.8.6
+=====
+* We undeprecated ``url2dict`` and ``extract_params`` as these functions turned
+  out to be useful in downstream projects.
+
+1.8.5
+=====
+* Changed generic `IO` type to `BinaryIO`.
+
+1.8.4
+=====
+* Removing invalid BSD-3 Clause license classifier.
+
+1.8.3
+=====
+* Changed `__iter__` return type to `Iterator`.
+
 1.8.2
 =====
 * Include Python 3.12 in CI

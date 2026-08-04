@@ -1,6 +1,8 @@
 import pytest
 
-storage = pytest.importorskip("google.cloud.storage")
+storage = pytest.importorskip(
+    "google.cloud.storage", reason="'google.cloud.storage' is not available"
+)
 
 import os
 import pickle
@@ -37,9 +39,9 @@ def gc_credentials():
         "google-cloud-tests", "emulator_endpoint", fallback=None
     )
 
-    assert (
-        credentials_path or emulator_endpoint
-    ), "Either set endpoint (for gc emulation) or credentials_json_path (for actual gc)"
+    assert credentials_path or emulator_endpoint, (
+        "Either set endpoint (for gc emulation) or credentials_json_path (for actual gc)"
+    )
 
     if emulator_endpoint:
         # google's client library looks for this env var

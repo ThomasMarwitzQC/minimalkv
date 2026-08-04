@@ -19,7 +19,7 @@ jobs:
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Set up Conda env
-        uses: mamba-org/setup-micromamba@db1df3ba9e07ea86f759e98b575c002747e9e757
+        uses: mamba-org/setup-micromamba@422500192359a097648154e8db4e39bdb6c6eed7
         with:
           environment-name: pre-commit
           create-args: >-
@@ -34,7 +34,7 @@ jobs:
         run: |
           pre-commit autoupdate
           pre-commit run -a || true
-      - uses: peter-evans/create-pull-request@153407881ec5c347639a548ade7d8ad1d6740e38
+      - uses: peter-evans/create-pull-request@a4f52f8033a6168103c2538976c07b467e8163bc
         with:
           commit-message: "Auto-update pre-commit hooks"
           title: "Auto-update pre-commit hooks"

@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Conda env
-        uses: mamba-org/setup-micromamba@db1df3ba9e07ea86f759e98b575c002747e9e757
+        uses: mamba-org/setup-micromamba@422500192359a097648154e8db4e39bdb6c6eed7
         with:
           environment-file: environment.yml
           cache-environment: true
@@ -46,27 +46,55 @@ jobs:
       - id: google_auth
         if: steps.check-id-token.outcome == 'success'
         name: "Authenticate to Google Cloud"
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: "projects/498651197656/locations/global/workloadIdentityPools/qc-minimalkv-gh-actions-pool/providers/github-actions-provider"
           service_account: "sa-github-actions@qc-minimalkv.iam.gserviceaccount.com"
           token_format: "access_token"
-      - name: Run the unittests
+      - name: Authenticate to AWS
+        if: steps.check-id-token.outcome == 'success'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::211125346859:role/github-poweruser
+          aws-region: eu-central-1
+        # We set an env variable according to the result of the check
+        # to only allow skipping of aws integration test when in fork.
+        # When being run in the base repo, the aws integration test should always be executed.
+      - name: Remap AWS Environment Variables
+        if: steps.check-id-token.outcome == 'success'
+        run: |
+          echo "ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "SESSION_TOKEN=${{ env.AWS_SESSION_TOKEN }}" >> $GITHUB_ENV
+        # This is a work around as long as S3FSStore has the side effect of setting env variables
+        # to provide authentication. This can savely be removed as soon as this side effect is gone
+      - name: Check whether the workflow runs in a fork
+        run: echo "CI_IN_FORK=${{ github.event.pull_request && github.repository != github.event.pull_request.head.repo.full_name }}" >> $GITHUB_ENV
+      - name: "Run setup: install package & start docker container"
         shell: bash -x -l {0}
         run: |
           pip install --no-deps .
           docker-compose up -d
           while ! docker exec mysql mysqladmin status -h 127.0.0.1 -u minimalkv_test --password=minimalkv_test; \
             do sleep 3; done
+      - name: Run the unittests
+        shell: bash -l {0}
+        run: |
           pytest -n auto --dist loadfile -rs --cov=minimalkv --cov-report=xml
+      - name: Build the package
+        shell: bash -x -l {0}
+        run: |
           python -m build
+      - name: Typecheck the codebase
+        shell: bash -x -l {0}
+        run: mypy minimalkv
       - name: Publish package
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.PYTHON_VERSION == '3.10'
-        uses: pypa/gh-action-pypi-publish@v1.8.10
+        uses: pypa/gh-action-pypi-publish@v1.8.14
         with:
           user: __token__
           password: ${{ secrets.pypi_password }}
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
 
@@ -79,12 +107,12 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
       - name: Set up micromamba
-        uses: mamba-org/setup-micromamba@db1df3ba9e07ea86f759e98b575c002747e9e757
+        uses: mamba-org/setup-micromamba@422500192359a097648154e8db4e39bdb6c6eed7
       - name: Add micromamba to GITHUB_PATH
         run: echo "${HOME}/micromamba-bin" >> "$GITHUB_PATH"
       - name: Install Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - name: Run pre-commit checks
-        uses: pre-commit/action@v3.0.0
+        uses: pre-commit/action@v3.0.1
