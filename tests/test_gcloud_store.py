@@ -39,9 +39,9 @@ def gc_credentials():
         "google-cloud-tests", "emulator_endpoint", fallback=None
     )
 
-    assert (
-        credentials_path or emulator_endpoint
-    ), "Either set endpoint (for gc emulation) or credentials_json_path (for actual gc)"
+    assert credentials_path or emulator_endpoint, (
+        "Either set endpoint (for gc emulation) or credentials_json_path (for actual gc)"
+    )
 
     if emulator_endpoint:
         # google's client library looks for this env var
